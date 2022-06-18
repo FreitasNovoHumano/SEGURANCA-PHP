@@ -16,7 +16,7 @@ class User extends Model
     protected static $entity = "users";
     
     //Ajuda construir os dados cadastrais de um novo usuário
-    public function bootstrap($firstName, $lastName, $email, $document = null)
+    public function bootstrap($firstName, $lastName, $email, $document = null): ?User
     {
         $this->first_name = $firstName;
         $this->last_name = $lastName;

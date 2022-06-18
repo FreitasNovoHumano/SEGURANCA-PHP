@@ -5,12 +5,13 @@ namespace Source\Core;
 use PDO;
 use PDOException;
 
-/**
- * Class Connect
- * @package Source\Core
- */
 class Connect 
 {
+    private const HOST = "localhost";
+    private const USER = "root";
+    private const DBNAME = "fullstackphp";
+    private const PASSWD = "";
+    
     private const OPTIONS = [
         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -43,16 +44,10 @@ class Connect
         return self::$instance;
     }
     
-    /**
-     * Connect Constructor
-     */
     final protected function __construct() 
     {   
     }
     
-    /**
-     * Connect Clone
-     */
     final protected function __clone() 
     {      
     }
