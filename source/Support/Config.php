@@ -25,3 +25,12 @@ define("CONF_DATE_APP", "y-m-d H:i:s");
  * SESSION
  */
 define("CONF_SES_PATH", __DIR__ . "/../../storage/sessions/");//Arquivo onde as sessões seram armazenadas
+
+/*
+ * MESSAGE
+ */
+define("CONF_MESSAGE_CLASS", "trigger");//class css que formata a mensagem
+define("CONF_MESSAGE_INFO", "info");// class de formação da mensagem
+define("CONF_MESSAGE_SUCCESS", "success");//seguindo padrão psr-3
+define("CONF_MESSAGE_WARNING", "warning");// class de alerta
+define("CONF_MESSAGE_ERROR", "error");// class erro

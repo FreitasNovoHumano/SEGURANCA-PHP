@@ -93,5 +93,19 @@ class Session
     {
         session_destroy();
         return $this;        
-    }            
+    }
+    
+    /**
+     * return null|Message
+     */
+    //Método Flash para monitorar, atribuir e exibição da mensagem
+    public function flash()
+    {
+        if($this->has("flash")){
+            $flash = $this->flash;//Atribuindo a essa váriavel o obj flash
+            $this->unset("flash");//Limpando a msn flash
+            return $flash;
+        } 
+        return null;
+    }
 }
