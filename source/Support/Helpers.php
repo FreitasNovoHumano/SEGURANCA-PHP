@@ -53,6 +53,26 @@ function passwd_rehash($hash) //Método para fazer o Rehash
     return password_needs_rehash($hash, CONF_PASSWD_ALGO, CONF_PASSWD_OPTION);    
 }
 
+function csrf_input()
+{
+    session()->csrf();//Sempre que o input rodar a chave muda
+    return "<input type='hidden' name='csrf' value='" . (session()->csrf_token ?? "") . "'/>";
+    //TYPE='HIDDEN' deixa o campo criado no form invisívél para o usuário
+}
+
+/**
+ * @param $request
+ * @return boolean
+ */
+function csrf_verify($request)
+{
+    //Verificando se existe o token na sessão ou se não existe na requisição, verificar o indice csrf, se for diferente false
+    if (empty(session()->csrf_token) || empty($request['csrf']) || $request['csrf'] != session()->csrf_token){
+        return false;
+    } 
+    return true;
+}
+
 /**
  * ##################
  * ###   STRING   ###

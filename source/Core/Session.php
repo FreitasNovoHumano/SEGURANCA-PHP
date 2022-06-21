@@ -35,9 +35,9 @@ class Session
      * @param $name
      * @return bool
      */
-    public function __isset($name): bool 
+    public function __isset($name)
     {
-        $this->has($name);
+        return $this->has($name);
     }
         /**
          * @return object|null
@@ -107,5 +107,13 @@ class Session
             return $flash;
         } 
         return null;
+    }
+    
+    /**
+     * CSRF Token
+     */
+    public function csrf()//Método que cria um indice na sessão para saber se o usuário realmente se encontra no site
+    {
+        $_SESSION['csrf_token'] = base64_decode(random_bytes(20));//Garantindo a seguranção do formulário      
     }
 }
