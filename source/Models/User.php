@@ -15,87 +15,113 @@ class User extends Model
     /** @var string $entity database table */
     protected static $entity = "users";
     
+    /** @var array $required table fileds */
+    protected static $required = ["first_name", "last_name", "email", "password"];
+
+
     //Ajuda construir os dados cadastrais de um novo usuário
-    public function bootstrap($firstName, $lastName, $email, $document = null): ?User
+    public function bootstrap($firstName, $lastName, $email, $password, $document = null): ?User
     {
         $this->first_name = $firstName;
         $this->last_name = $lastName;
         $this->email = $email;
+        $this->password = $password;
         $this->document = $document;
         return $this;//Permite trabalhar com todos os métodos na index
     }
     
-    //Buscar o usuário pelo id
-    public function load(int $id, string $columns = "*")
+    /**
+     * @param string $terms
+     * @param string $params
+     * @param string $columns
+     * @return null|User
+     */
+    public function find($terms, $params, $columns = "*")
     {
-        $load = $this->read("SELECT * FROM users  WHERE id = :id" ,"id={$id}");
-        if ($this->fail() || !$load->rowCount()){//Deu erro ou não obteve result
-            $this->message = "Usuário não encontrado para o id informado";
+        $find = $this->read("SELECT * FROM users  WHERE {$terms}", $params);
+        if ($this->fail() || !$find->rowCount()){//Deu erro ou não obteve result
             return null;
         }//Caso contrário ativa todos os métodos da classe nesse carregamento      
-        return $load->fetchObject(__CLASS__);
+        return $find->fetchObject(__CLASS__);       
+    }
+
+    /**
+     * @param int $id
+     * @param string $columns
+     * @return null|User
+     */    
+    public function findById(int $id, string $columns = "*")
+    {
+        return $this->find("id = :id", "id={$id}", $columns);
     }
     
-    public function find($email)//Busca pelo e-mail
+    /**
+     * @param $email
+     * @param string $columns
+     * @return null|User
+     */
+    public function findByEmail($email, $columns = "*")//Busca pelo e-mail
     {
-        $find = $this->read("SELECT * FROM users  WHERE email = :email" ,"email={$email}");
-        if ($this->fail() || !$find->rowCount()){//Deu erro ou não obteve result
-            $this->message = "Usuário não encontrado para o e-mail informado";
-            return null;
-        }//Caso contrário ativa todos os métodos da classe nesse carregamento      
-        return $find->fetchObject(__CLASS__);
+       return $this->find("email = :email", "email={$email}", $columns);
         
     }
     
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @param string $columns
+     * @return tarray|null
+     */
     public function all(int $limit = 30, int $offset = 0, $columns = "*")//Busca todos os resultados
     {
         $entity = self::$entity;
          $all = $this->read("SELECT {$columns} FROM {$entity} LIMIT :limit OFFSET :offset", " limit={$limit}&offset={$offset}");
         if ($this->fail() || !$all->rowCount()){//Deu erro ou não obteve result
-            $this->message = "Sua consulta não retornou usuários";
             return null;
         }//Caso contrário ativa todos os métodos da classe nesse carregamento      
-        return $all->fetchAll(\PDO::FETCH_CLASS, __CLASS__);
-        
+        return $all->fetchAll(\PDO::FETCH_CLASS, __CLASS__);        
     }
     
-    public function save()//Responsavel por cadastrar ou salvar usuário na base
+    /**
+     * @return $this
+     */
+    public function save()//Responsavel por cadastrar e salvar usuário na base
     {
         if (!$this->required()){
+            $this->message->warning("Nome, sobrenome, email e senha são obrigatórios");
             return null;
         }
         /** User Update */
         if (!empty($this->id)){
             $userId = $this->id;
-            $email = $this->read("SELECT id FROM users WHERE email = :email "
-                    . "AND id != :id", "email={$this->email}&id={$userId}");
-            if ($email->rowCount()){
-                $this->message = "O e-mail informado já está cadastrado!";
+            
+            if ($this->find("email = :e AND i != :id", "e={$this->email}&i={$userId}")){
+                $this->message->warning("O e-mail informado já está cadastrado!");
                 return null;
             }
             
             $this->update(self::$entity, $this->safe(), "id = :id", "id={$userId}");
         if ($this->fail()){
-            $this->message = "Erro ao atualizar, verifique os dados";
-        }
-        $this->message = "Dados atualizados com sucesso";                    
+            $this->message->error("Erro ao atualizar, verifique os dados");
+            return null;
+        }                    
     }     
         
         /** User Create */
         if (empty($this->id)){
-            if($this->find($this->email)){
-                $this->message = "O e-mail informado já está cadastrado!";
+            if($this->findByEmail($this->email)){
+                $this->message->warning("O e-mail informado já está cadastrado!") ;
                 return null;
             }
             
             $userId = $this->create(self::$entity, $this->safe());
             if ($this->fail()){
-                $this->message = "Erro ao cadastrar, verifique os dados";
-            }
-            $this->message = "Cadastro realizado com sucesso!";            
+                $this->message->error("Erro ao cadastrar, verifique os dados");
+                return null;
+            }           
         }
         
-        $this->data = $this->read("SELECT * FROM users WHERE id = :id", "id={$userId}")->fetch();
+        $this->data = ($this->findById($userId))->data();
         return $this;
     }
     
@@ -113,21 +139,5 @@ class User extends Model
         $this->message = "Usuário removido com sucesso";
         $this->data = null;//Limpa os dados
         return $this;        
-    }
-    
-    private function required()//Diz quais os capos é obrigatorio no cadastro
-    {
-        if (empty($this->first_name) || empty($this->last_name) || empty($this->email)){
-            $this->message = "Nome, sobrenome e e-mail são obrigatórios";
-            return false;
-        }
-        
-        if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
-            $this->message = "O e-mail informado não parece válido";
-            return false;
-        }
-        
-        return true;
-        
     }
 }
