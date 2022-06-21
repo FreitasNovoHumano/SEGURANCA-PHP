@@ -32,6 +32,9 @@ define("CONF_SES_PATH", __DIR__ . "/../../storage/sessions/");//Arquivo onde as 
  */
 define("CONF_PASSWD_MIN_LEN", 8);
 define("CONF_PASSWD_MAX_LEN", 40);
+define("CONF_PASSWD_ALGO", PASSWORD_DEFAULT);//Criptografa a senha
+define("CONF_PASSWD_OPTION",["cost" => 10]);
+
 
 /*
  * MESSAGE
