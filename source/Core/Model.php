@@ -114,15 +114,18 @@ abstract class Model
      * @param string|null $params
      * @return null|\PDOStatement
      */
-    protected function read(string $select, string $params = null): ?\PDOStatement
+    protected function read(string $select, string $params = null)
     {
         try {
             $stmt = Connect::getInstance()->prepare($select);
             if ($params) {
-                parse_str($params, $params);
+                parse_str($params, $params);//Trás todos os parâmetros com string
                 foreach ($params as $key => $value) {
-                    $type = (is_numeric($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
-                    $stmt->bindValue(":{$key}", $value, $type);
+                    if ($key == 'limit' || $key == 'offset'){
+                        $stmt->bindValue(":{$key}", $value, \PDO::PARAM_INT);
+                    } else {
+                        $stmt->bindValue(":{$key}", $value, \PDO::PARAM_STR);                        
+                    }
                 }
             }
 

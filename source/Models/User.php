@@ -75,7 +75,8 @@ class User extends Model
     public function all(int $limit = 30, int $offset = 0, $columns = "*")//Busca todos os resultados
     {
         $entity = self::$entity;
-         $all = $this->read("SELECT {$columns} FROM {$entity} LIMIT :limit OFFSET :offset", " limit={$limit}&offset={$offset}");
+         $all = $this->read("SELECT {$columns} FROM {$entity} LIMIT :limit "
+         . "OFFSET :offset", " limit={$limit}&offset={$offset}");
         if ($this->fail() || !$all->rowCount()){//Deu erro ou não obteve result
             return null;
         }//Caso contrário ativa todos os métodos da classe nesse carregamento      
