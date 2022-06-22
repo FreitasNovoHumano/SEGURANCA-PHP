@@ -22,6 +22,10 @@ function is_email(string $email)//Verificação de e-mail
  */
 function is_passwd(string $password)//Validado a quantidade min e max de caracter
 {
+    if (password_get_info($password)['algo']){
+        return true;
+    }
+    
     return (mb_strlen($password) >= CONF_PASSWD_MIN_LEN && mb_strlen($password) <= CONF_PASSWD_MAX_LEN ? true : false);    
 }
 

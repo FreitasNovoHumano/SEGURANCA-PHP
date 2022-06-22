@@ -83,19 +83,34 @@ class User extends Model
     }
     
     /**
-     * @return $this
+     * @return null|User
      */
-    public function save()//Responsavel por cadastrar e salvar usuário na base
+    public function save() //Responsavel por cadastrar e salvar usuário na base
     {
         if (!$this->required()){
             $this->message->warning("Nome, sobrenome, email e senha são obrigatórios");
             return null;
         }
+        
+        if (!is_email($this->email)){
+            $this->message->warning("O e-mail informado não tem formato válido");
+            return null;
+        }
+        
+        if(!is_passwd($this->password)){
+            $min = CONF_PASSWD_MIN_LEN;
+            $max = CONF_PASSWD_MAX_LEN;
+            $this->message->warning("A senha deve ter entre {$min} e {$max} caracteres"); 
+            return null;
+        } else {
+            $this->password = passwd($this->password);            
+        }
+        
         /** User Update */
         if (!empty($this->id)){
             $userId = $this->id;
             
-            if ($this->find("email = :e AND i != :id", "e={$this->email}&i={$userId}")){
+            if ($this->find("email = :e AND id != :i", "e={$this->email}&i={$userId}")){
                 $this->message->warning("O e-mail informado já está cadastrado!");
                 return null;
             }

@@ -44,10 +44,10 @@ var_dump($list);
 fullStackPHPClassSession("save create", __LINE__);
 
 $user = $model->bootstrap(
-        "Vivian",
-        "Silva",
-        "tereza34@yahoo.com.br",
-        "2397219575"
+        "Lucas",
+        "Lindomar",
+        "lucas14@yahoo.com.br",
+        "32972195"
 );
 
 if ($user->save()){
@@ -62,10 +62,10 @@ if ($user->save()){
  */
 fullStackPHPClassSession("save update", __LINE__);
 
-$user = (new \Source\Models\User())->findById(60);
-$user->first_name = "Tereza";
-$user->last_name = "capistrano";
-$user->password = passwd(553798927);
+$user = (new \Source\Models\User())->findById(64);
+$user->first_name = "Lucas";
+$user->last_name = "Lindomar";
+$user->password = passwd("47798927456976");
 
 if ($user->save()){
     echo message()->success("Dados atualizado com sucesso!");
